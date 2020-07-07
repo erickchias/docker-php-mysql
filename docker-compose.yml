@@ -1,0 +1,54 @@
+version: '2'
+services:
+
+  # Application
+  app:
+    build:
+      context: ./
+      dockerfile: app.dockerfile
+    working_dir: /var/www
+    volumes:
+      - /path/to/code:/var/www
+    environment:
+      - "DB_PORT=3306"
+      - "DB_HOST=database"
+
+  # Web Server
+  web:
+    build:
+      context: ./
+      dockerfile: web.dockerfile
+    working_dir: /var/www
+    volumes_from:
+      - app
+    ports:
+      - 80:80
+
+  # Database
+  database:
+    image: mysql:5.6
+    volumes:
+      - dbdata:/var/lib/mysql
+    environment:
+      - "MYSQL_DATABASE=homestead"
+      - "MYSQL_USER=homestead"
+      - "MYSQL_PASSWORD=secret"
+      - "MYSQL_ROOT_PASSWORD=secret"
+    ports:
+        - "3306:3306"
+  
+  # Start phpmyadmin instance connected to db
+  # phpmyadmin:
+  #   depends_on:
+  #     - database
+  #   image: phpmyadmin/phpmyadmin
+  #   ports:
+  #     - '8080:80'
+  #   environment:
+  #     PMA_HOST: database
+  #     PMA_USER: homestead
+  #     PMA_PASSWORD: secret
+  #     MYSQL_ROOT_PASSWORD: secret
+
+volumes:
+  dbdata:
